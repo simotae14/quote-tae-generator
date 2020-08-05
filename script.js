@@ -4,9 +4,25 @@ const quoteText = document.getElementById('quote');
 const authorText = document.getElementById('author');
 const twitterBtn = document.getElementById('twitter');
 const newQuoteBtn = document.getElementById('new-quote');
+const loader = document.getElementById('loader');
+
+// Show loading
+function loading() {
+  loader.hidden = false;
+  quoteContainer.hidden = true;
+}
+
+// Hide loading
+function complete() {
+  if (!loader.hidden) {
+    loader.hidden = true;
+    quoteContainer.hidden = false;
+  }
+}
 
 // Get Quote from API
 async function getQuote() {
+  loading();
   const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
   const apiUrl = 'https://favqs.com/api/qotd';
   try {
@@ -27,6 +43,8 @@ async function getQuote() {
       quoteText.classList.remove('long-quote');
     }
     quoteText.innerText = body;
+    // Stop Loader, Show Quote
+    complete();
   } catch (error) {
     getQuote();
     console.log('whoops, no quote', error);
