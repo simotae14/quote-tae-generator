@@ -6,23 +6,23 @@ const twitterBtn = document.getElementById('twitter');
 const newQuoteBtn = document.getElementById('new-quote');
 const loader = document.getElementById('loader');
 
-// Show loading
-function loading() {
+let attempt = 0;
+const maxNumberAttempts = 10;
+
+function showLoadingSpinner() {
   loader.hidden = false;
   quoteContainer.hidden = true;
 }
 
-// Hide loading
-function complete() {
+function removeLoadingSpinner() {
   if (!loader.hidden) {
     loader.hidden = true;
     quoteContainer.hidden = false;
   }
 }
 
-// Get Quote from API
-async function getQuote() {
-  loading();
+async function getQuoteFromAPI() {
+  showLoadingSpinner();
   const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
   const apiUrl = 'https://favqs.com/api/qotd';
   try {
@@ -43,11 +43,14 @@ async function getQuote() {
       quoteText.classList.remove('long-quote');
     }
     quoteText.innerText = body;
-    // Stop Loader, Show Quote
-    complete();
+    removeLoadingSpinner();
   } catch (error) {
-    getQuote();
-    console.log('whoops, no quote', error);
+    attempt++;
+    if (attempt < maxNumberAttempts) {
+      getQuoteFromAPI();
+    }
+    getQuoteFromAPI();
+    console.log('whoops, there\'s something bad, you have reached the maximum number of attempts because of this error: ', error);
   }
 }
 
@@ -61,8 +64,8 @@ function tweetQuote() {
 }
 
 // Event listeners
-newQuoteBtn.addEventListener('click', getQuote);
+newQuoteBtn.addEventListener('click', getQuoteFromAPI);
 twitterBtn.addEventListener('click', tweetQuote);
 
 // On Load
-getQuote();
+getQuoteFromAPI();
